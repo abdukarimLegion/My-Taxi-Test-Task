@@ -1,0 +1,47 @@
+{
+  ConstraintSets: {
+    start: {
+      chevrons_up : {
+        start: ['parent', 'start', 16],
+        top: ['parent', 'top', 0],
+        bottom: ['parent', 'bottom', 0],
+        visibility: 'visible',
+      },
+      map_action_buttons: {
+        top: ['chevrons_up', 'top', 0],
+        end: ['parent', 'end', 16],
+        visibility: 'visible',
+      },
+      bottom_sheet: {
+        start: ['parent', 'start'],
+        end: ['parent', 'end'],
+        bottom: ['parent', 'bottom', -90],
+      }
+    },
+    end: {
+      chevrons_up : {
+        start: ['parent', 'start', 40],
+        top: ['parent', 'top', 0],
+        bottom: ['parent', 'bottom', 0],
+        visibility: 'invisible'
+      },
+      map_action_buttons: {
+        top: ['chevrons_up', 'top', 0],
+        end: ['parent', 'end', 40],
+        visibility: 'invisible'
+      },
+      bottom_sheet: {
+        start: ['parent', 'start'],
+        end: ['parent', 'end'],
+        bottom: ['parent', 'bottom'],
+      }
+    }
+  },
+  Transitions: {
+    default: {
+      from: 'start',
+      to: 'end',
+//      pathMotionArc: 'startHorizontal'
+    }
+  }
+}
