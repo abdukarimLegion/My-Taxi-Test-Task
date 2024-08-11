@@ -1,23 +1,22 @@
 package uz.mango.my_taxi_test_task.data.repository
 
-import com.plcoding.weatherapp.domain.location.LocationTracker
-import com.plcoding.weatherapp.domain.location.LocationTrackerImpl
-import kotlinx.coroutines.flow.Flow
-import uz.mango.my_taxi_test_task.data.model.UserLocation2
-import uz.mango.my_taxi_test_task.domain.repository.MainRepository
+import uz.mango.my_taxi_test_task.data.dao.UserLocationDao
+import uz.mango.my_taxi_test_task.data.model.UserLocationEntity
 import javax.inject.Inject
 
-class MainRepositoryImpl @Inject constructor(
-    private val localDataSource: LocationTrackerImpl
-) : MainRepository{
+interface MainRepository {
+    suspend fun insertUserLocation(userLocation: UserLocationEntity)
+    suspend fun getUserLocation(): UserLocationEntity
+}
 
-     override suspend fun insertUserCurrentLocation(userLocation: UserLocation2) {
-        localDataSource.insertCurrentLocation(userLocation)
+class MainRepositoryImpl @Inject constructor(
+    private val userLocationDao: UserLocationDao,
+) : MainRepository {
+    override suspend fun insertUserLocation(userLocation: UserLocationEntity) {
+        userLocationDao.insert(userLocation)
     }
 
-
-
-     override suspend fun getLatestUserLocation(): Flow<UserLocation2?> {
-        return localDataSource.getCurrentLocation()
+    override suspend fun getUserLocation(): UserLocationEntity {
+        return userLocationDao.getFirstLocation()
     }
 }

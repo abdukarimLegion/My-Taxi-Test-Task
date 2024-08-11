@@ -2,7 +2,6 @@ package com.plcoding.weatherapp.data.location
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
@@ -14,16 +13,11 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
-import com.plcoding.weatherapp.domain.location.LocationTracker
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import uz.mango.my_taxi_test_task.data.model.UserLocation2
-import javax.inject.Inject
-import kotlin.coroutines.resume
+
 //
 //@ExperimentalCoroutinesApi
 //class DefaultLocationTracker @Inject constructor(

@@ -1,7 +1,6 @@
 package uz.mango.my_taxi_test_task.presentation.ui.screen.home_ui
 
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.annotation.DrawableRes
@@ -9,9 +8,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,10 +21,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -40,14 +35,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ExperimentalMotionApi
 import androidx.constraintlayout.compose.MotionLayout
@@ -64,15 +55,15 @@ import com.mapbox.maps.extension.compose.rememberMapState
 import com.mapbox.maps.extension.compose.style.MapStyle
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import uz.mango.my_taxi_test_task.R
+import uz.mango.my_taxi_test_task.presentation.ui.screen.home_ui.component.BottomSheetContent
 import uz.mango.my_taxi_test_task.presentation.ui.screen.home_ui.component.TabView
-import androidx.hilt.navigation.compose.hiltViewModel
 
 
 @OptIn(MapboxExperimental::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -106,9 +97,23 @@ fun HomeScreen(
             },
             onZoomIn = {
                 viewModel.dispatch(HomeIntent.OnZoomIn)
+                mapViewportState.easeTo(
+                    cameraOptions = cameraOptions {
+                        zoom(uiState.mapState.zoom)
+                    },
+                    MapAnimationOptions.mapAnimationOptions { duration(1_000) }
+                )
+
             },
             onZoomOut = {
                 viewModel.dispatch(HomeIntent.OnZoomOut)
+                mapViewportState.easeTo(
+                    cameraOptions = cameraOptions {
+                        zoom(uiState.mapState.zoom)
+                    },
+                    MapAnimationOptions.mapAnimationOptions { duration(1_000) }
+                )
+
             },
             onLocateUser = {
                 uiState.mapState.userLiveLocation?.let {
@@ -142,6 +147,7 @@ fun HomeScreen(
 }
 
 
+    @OptIn(MapboxExperimental::class)
     @Composable
     fun HomeScreenContent(
         modifier: Modifier = Modifier,
@@ -174,7 +180,7 @@ fun HomeScreen(
                 scaleBar = {}
             ) {
                 loc.let { location ->
-                    UserLocationPinCar(location = (UserLocation(69.3114,41.3411)))
+                    UserLocationPinCar(location = (UserLocation(69.2401, 41.2995)))
                     Log.i(TAG, "HomeMapView: $location")
                 }
             }
@@ -245,7 +251,9 @@ fun HomeScreenOverlayContent(
             MenuButton(onMenuPressed = onMenuPressed)
 
             TabView(
-                modifier = Modifier.weight(1f).wrapContentWidth(),
+                modifier = Modifier
+                    .weight(1f)
+                    .wrapContentWidth(),
                 isActiveTabOpen = {}
             )
 
@@ -290,7 +298,7 @@ fun HomeScreenOverlayContent(
                 )
             }
 
-            HomeBottomSheetContent(
+            BottomSheetContent(
                 modifier = Modifier
                     .layoutId("bottom_sheet")
                     .pointerInput(Unit) {
@@ -396,7 +404,7 @@ fun SpeedDisplay(modifier: Modifier = Modifier, speed: Int) {
 
 
 @Composable
-fun UserLocationPinCar(location: UserLocation) {
+fun UserLocationPinCar2(location: UserLocation) {
     val context = LocalContext.current
     val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_car_pin)
 
@@ -411,143 +419,19 @@ fun UserLocationPinCar(location: UserLocation) {
     )
 }
 
-
-
 @Composable
-fun BottomSheetDragHandle() {
-    Box(
-        modifier = Modifier
-            .size(32.dp, 5.dp)
-            .clip(MaterialTheme.shapes.extraSmall)
-            .background(MaterialTheme.colorScheme.onSurface)
+fun UserLocationPinCar(location: UserLocation) {
+    val context = LocalContext.current
+    val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_car_pin)
+
+    PointAnnotation(
+        point = Point.fromLngLat(location.longitude, location.latitude),
+        iconImageBitmap = bitmap,
+        onClick = {
+            true
+        }
     )
 }
 
-@Composable
-fun HomeBottomSheetContent(
-    modifier: Modifier,
-    onNavigateToTariff: () -> Unit,
-    onNavigateToOrders: () -> Unit,
-    onNavigateToBordur: () -> Unit,
-) {
 
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
 
-        BottomSheetDragHandle()
-
-        Box(
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.extraLarge)
-                .background(MaterialTheme.colorScheme.primary)
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(top = 12.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
-                    .clip(MaterialTheme.shapes.small)
-                    .background(MaterialTheme.colorScheme.secondary)
-            ) {
-                items.forEachIndexed { index, sheetItem ->
-                    BottomSheetListItem(
-                        sheetItem = sheetItem,
-                        onClick = {
-                            when (index) {
-                                0 -> onNavigateToTariff()
-                                1 -> onNavigateToOrders()
-                                2 -> onNavigateToBordur()
-                            }
-                        },
-                    )
-
-                    if (index < items.size - 1) {
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun BottomSheetListItem(
-    modifier: Modifier = Modifier,
-    sheetItem: SheetItem,
-    onClick: () -> Unit
-
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .padding()
-            .clickable(
-                onClick = onClick,
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(color = Color.Black)
-            )
-            .padding(all = 16.dp)
-    ) {
-        Icon(
-            imageVector = ImageVector.vectorResource(id = sheetItem.iconResId),
-            contentDescription = sheetItem.contentDescription,
-            tint = MaterialTheme.colorScheme.onSecondary
-        )
-
-        Text(
-            text = sheetItem.text,
-            style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onPrimary),
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 8.dp)
-        )
-
-        sheetItem.value?.let { value ->
-            Text(
-                text = value,
-                style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSecondary),
-                modifier = Modifier.padding(end = 2.dp)
-            )
-        }
-
-        Icon(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_chevron_right),
-            contentDescription = "Chevron right",
-            tint = MaterialTheme.colorScheme.onTertiary
-        )
-    }
-}
-
-data class SheetItem(
-    @DrawableRes val iconResId: Int,
-    val contentDescription: String,
-    val text: String,
-    val value: String?
-)
-
-val items = listOf(
-    SheetItem(
-        iconResId = R.drawable.ic_tariff,
-        contentDescription = "Tariff",
-        text = "Tariff",
-        value = "6/8"
-    ),
-    SheetItem(
-        iconResId = R.drawable.ic_order,
-        contentDescription = "Buyurtmalar",
-        text = "Buyurtmalar",
-        value = "0"
-    ),
-    SheetItem(
-        iconResId = R.drawable.ic_rocket,
-        contentDescription = "Bordur",
-        text = "Bordur",
-        value = null
-    ),
-)

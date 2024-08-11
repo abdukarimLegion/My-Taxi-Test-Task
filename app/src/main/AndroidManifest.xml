@@ -21,6 +21,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyTaxiTestTask"
         tools:targetApi="31">
+
+        <service
+            android:name=".domain.usecase.LocationForegroundService"
+            android:foregroundServiceType="location"
+            android:enabled="true"
+            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -37,7 +44,6 @@
             android:name="com.mapbox.token"
             android:value="sk.eyJ1IjoiYWJkdWthcmltIiwiYSI6ImNsemx6d2dqMjAwcnYyanI3aXM3Z255dmcifQ.fUqkbG0WFOFs2ncWercqdA" />
 
-<!--        <service android:name=".common.service.LocationService" android:foregroundServiceType="location" />-->
 
     </application>
 
